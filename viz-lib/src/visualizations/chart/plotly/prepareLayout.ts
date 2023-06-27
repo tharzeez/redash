@@ -107,7 +107,7 @@ function prepareBoxLayout(layout: any, options: any, data: any) {
 }
 
 export default function prepareLayout(element: any, options: any, data: any) {
-  const { thresholdValue, thresholdType, thresholdColor } = options;
+  const { thresholdValue, thresholdColor } = options;
   const layout = {
     margin: { l: 10, r: 10, b: 5, t: 20, pad: 4 },
     // plot size should be at least 5x5px
@@ -125,7 +125,20 @@ export default function prepareLayout(element: any, options: any, data: any) {
 
   if (thresholdValue) {
     // @ts-expect-error ts-migrate(2339) Property 'shapes' does not exist on type '{ margin: { l: number; r: number; b: number; t: number; pad: number; }; width: number; height: number; autosize: boolean; showlegend: any; legend: { traceorder: any; }; hoverlabel: { namelength: number; }; }'
-    layout.shapes = [
+    layout.shapes = options.swappedAxes ? [
+      {
+        type: 'line',
+        yref: 'paper',
+        x0: thresholdValue,
+        y0: 1,
+        x1: thresholdValue,
+        y1: 0,
+        line: {
+          color: thresholdColor || 'rgb(0, 0, 0)', // Setting default color to white
+          width: 4,
+        }
+      }
+    ] : [
       {
         type: 'line',
         xref: 'paper',
@@ -134,9 +147,8 @@ export default function prepareLayout(element: any, options: any, data: any) {
         x1: 0,
         y1: thresholdValue,
         line: {
-          color: thresholdColor || 'rgb(0, 255, 0)', // Setting default color to green
+          color: thresholdColor || 'rgb(0, 0, 0)', // Setting default color to white
           width: 4,
-          dash: thresholdType,
         }
       }
     ]

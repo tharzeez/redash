@@ -60,6 +60,42 @@ describe("Visualizations", () => {
         const layout = prepareLayout(fakeElement, getOptions(input.options), input.series);
         expect(layout).toEqual(output.layout);
       });
+
+      test("Default with stacking", () => {
+        const { input, output } = require("./fixtures/prepareLayout/default-with-stacking");
+        const layout = prepareLayout(fakeElement, getOptions(input.options), input.series);
+        expect(layout).toEqual(output.layout);
+      });
+
+      test("Box with single Y axis and threshold value", () => {
+        const { input, output } = require("./fixtures/prepareLayout/box-single-axis-with-threshold");
+        const layout = prepareLayout(fakeElement, getOptions(input.options), input.series);
+        expect(layout).toEqual(output.layout);
+      });
+
+      test("Box with second Y axis and threshold value", () => {
+        const { input, output } = require("./fixtures/prepareLayout/box-with-second-axis-with-threshold");
+        const layout = prepareLayout(fakeElement, getOptions(input.options), input.series);
+        expect(layout).toEqual(output.layout);
+      });
+
+      test("Default with single Y axis with threshold", () => {
+        const { input, output } = require("./fixtures/prepareLayout/default-single-axis-with-threshold");
+        const layout = prepareLayout(fakeElement, getOptions(input.options), input.series);
+        expect(layout).toEqual(output.layout);
+      });
+
+      test("Default with second Y axis with threshold", () => {
+        const { input, output } = require("./fixtures/prepareLayout/default-with-second-axis-with-threshold");
+        const layout = prepareLayout(fakeElement, getOptions(input.options), input.series);
+        expect(layout).toEqual(output.layout);
+      });
+
+      test("Box with single Y axis without threshold value", () => {
+        const { input, output } = require("./fixtures/prepareLayout/box-single-axis-with-threshold-without-threshold-value");
+        const layout = prepareLayout(fakeElement, getOptions(input.options), input.series);
+        expect(layout).toEqual(output.layout);
+      });
     });
   });
 });
