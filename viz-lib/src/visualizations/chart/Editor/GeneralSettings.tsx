@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { Section, Select, Checkbox, InputNumber } from "@/components/visualizations/editor";
 import { UpdateOptionsStrategy } from "@/components/visualizations/editor/createTabbedEditor";
 import { EditorPropTypes } from "@/visualizations/prop-types";
+import { arePropertiesSame } from "@/lib/utils";
 
 import ChartTypeSelect from "./ChartTypeSelect";
 import ColumnMappingSelect from "./ColumnMappingSelect";
@@ -105,22 +106,6 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
     onOptionsChange({ columnMapping }, UpdateOptionsStrategy.shallowMerge);
   }
 
-  function arePropertiesSame(arr: any, property: string) {
-    if (arr.length === 0) {
-      return true; // If the array is empty, all properties are considered the same
-    }
-
-    const firstValue = arr[0][property]; // Get the property value of the first object
-
-    for (let i = 1; i < arr.length; i++) {
-      if (arr[i][property] !== firstValue) {
-        return false; // If any subsequent property value is different, return false
-      }
-    }
-
-    return true; // If all property values are the same, return true
-  }
-
   function handleColumnThresholdValueChange(column: any) {
     if (arePropertiesSame(data.rows, column) && Number(data.rows[0][column])) {
       onOptionsChange({
@@ -178,6 +163,7 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
         <Select
           label="Threshold"
           value={options.thresholdColumnName}
+          data-test="Chart.Threshold"
           allowClear
           showSearch
           placeholder="Choose Threshold Column"

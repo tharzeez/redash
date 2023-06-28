@@ -134,7 +134,7 @@ export default function prepareLayout(element: any, options: any, data: any) {
         x1: thresholdValue,
         y1: 0,
         line: {
-          color: thresholdColor || 'rgb(0, 0, 0)', // Setting default color to white
+          color: thresholdColor || 'rgb(0, 0, 0)', // Setting default color to black
           width: 4,
         }
       }
@@ -147,7 +147,7 @@ export default function prepareLayout(element: any, options: any, data: any) {
         x1: 0,
         y1: thresholdValue,
         line: {
-          color: thresholdColor || 'rgb(0, 0, 0)', // Setting default color to white
+          color: thresholdColor || 'rgb(0, 0, 0)', // Setting default color to black
           width: 4,
         }
       }

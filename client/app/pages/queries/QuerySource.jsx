@@ -31,6 +31,7 @@ import useAutocompleteFlags from "./hooks/useAutocompleteFlags";
 import useAutoLimitFlags from "./hooks/useAutoLimitFlags";
 import useQueryExecute from "./hooks/useQueryExecute";
 import useQueryResultData from "@/lib/useQueryResultData";
+import { arePropertiesSame } from "@/lib/utils";
 import useQueryDataSources from "./hooks/useQueryDataSources";
 import useQueryFlags from "./hooks/useQueryFlags";
 import useQueryParameters from "./hooks/useQueryParameters";
@@ -160,37 +161,21 @@ function QuerySource(props) {
 
   const [selectedText, setSelectedText] = useState(null);
 
-  function arePropertiesSame(arr, property) {
-    if (arr.length === 0) {
-      return true; // If the array is empty, all properties are considered the same
-    }
-
-    const firstValue = arr[0][property]; // Get the property value of the first object
-
-    for (let i = 1; i < arr.length; i++) {
-      if (arr[i][property] !== firstValue) {
-        return false; // If any subsequent property value is different, return false
-      }
-    }
-
-    return true; // If all property values are the same, return true
-  }
-
   useEffect(() => {
     if (queryResult && !queryResult.errorMessage) {
-      const selectVisualization = query.visualizations.find(viz => viz.id === selectedVisualization);
-      if (
-        selectVisualization
-        && arePropertiesSame(queryResult.query_result.data.rows, selectVisualization.options.thresholdColumnName)
-        && Number(queryResult.query_result.data.rows[0][selectVisualization.options.thresholdColumnName])
-      ) {
-        selectVisualization.options.thresholdValue
-          = Number(queryResult.query_result.data.rows[0][selectVisualization.options.thresholdColumnName]);
-        const updatedVisualisationId = query.visualizations.findIndex(viz => viz.id === selectedVisualization);
-        let clonedQueryVisualizations = query.visualizations;
-        clonedQueryVisualizations.splice(updatedVisualisationId, 1, selectVisualization);
-        setQuery(extend(query.clone(), { visualizations: clonedQueryVisualizations }))
-      }
+      let clonedQueryVisualizations = query.visualizations;
+      clonedQueryVisualizations.map((viz) => {
+        const thresholdValue = Number(queryResult.query_result.data.rows[0][viz.options.thresholdColumnName]);
+        if (
+          viz.type !== "TABLE"
+          && arePropertiesSame(queryResult.query_result.data.rows, viz.options.thresholdColumnName)
+          && thresholdValue
+        ) {
+          viz.options.thresholdValue = thresholdValue;
+        }
+        return viz;
+      });
+      setQuery(extend(query.clone(), { visualizations: clonedQueryVisualizations }));
     }
   }, [queryResult]);
 
