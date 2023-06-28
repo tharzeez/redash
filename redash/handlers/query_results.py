@@ -82,6 +82,17 @@ def run_query(
         query.text, should_apply_auto_limit
     )
 
+    # RLS  Substitute username or groups.  Turn cache or previous results off with max_age=0
+    if '__REDASH_USER' in query_text or '__REDASH_USER_GROUPS' in query_text:
+        if hasattr(current_user, 'email'):
+            query_text = query_text.replace('__REDASH_USER_GROUPS',','.join(str(v) for v in current_user.group_ids))
+            query_text = query_text.replace('__REDASH_USER', current_user.email)
+        else:
+            query_text = query_text.replace('__REDASH_USER_GROUPS', ' -1 ')
+            query_text = query_text.replace('__REDASH_USER', 'guest@example.com')
+        max_age=0
+    # END RLS
+
     if query.missing_params:
         return error_response(
             "Missing parameter value for: {}".format(", ".join(query.missing_params))
