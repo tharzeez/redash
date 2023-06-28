@@ -170,7 +170,7 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
           onChange={handleColumnThresholdValueChange}>
           {map(data.columns, column => (
             // @ts-expect-error ts-migrate(2339) FIXME: Property 'Option' does not exist on type '({ class... Remove this comment to see the full error message
-            <Select.Option key={column.friendly_name} value={column.name}>
+            <Select.Option data-test={`Chart.Threshold.${column.name}`} key={column.friendly_name} value={column.name}>
               {column.name}
               {/* @ts-expect-error ts-migrate(2339) FIXME: Property 'Option' does not exist on type '({ class... Remove this comment to see the full error message */}
             </Select.Option>

@@ -4,15 +4,15 @@ import enzyme from "enzyme";
 import getOptions from "../getOptions";
 import GeneralSettings from "./GeneralSettings";
 
-function findByTestID(wrapper: any, testId: any) {
+function findByTestID(wrapper: enzyme.ReactWrapper, testId: string): enzyme.ReactWrapper {
   return wrapper.find(`[data-test="${testId}"]`);
 }
 
-function elementExists(wrapper: any, testId: any) {
+function elementExists(wrapper: enzyme.ReactWrapper, testId: string) {
   return findByTestID(wrapper, testId).length > 0;
 }
 
-function mount(options: any, done: any) {
+function mount(options: any, done: any): enzyme.ReactWrapper {
   options = getOptions(options);
   return enzyme.mount(
     <GeneralSettings
@@ -211,5 +211,38 @@ describe("Visualizations -> Chart -> Editor -> General Settings", () => {
       .last()
       .find("input")
       .simulate("change", { target: { checked: true } });
+  });
+
+  test("Selects threshold column from options", done => {
+    const el = mount(
+      {
+        globalSeriesType: "column",
+        series: {},
+        thresholdColum: "sum",
+        thresholdValue: 120,
+      },
+      done
+    ).setProps({
+      data: {
+        columns: [
+          {
+            name: "sum",
+            friendly_name: "sum"
+          }
+        ],
+        rows: [
+          {
+            sum: 120
+          }
+        ]
+      }
+    });
+
+    findByTestID(el, "Chart.Threshold")
+      .last()
+      .simulate("mouseDown");
+    findByTestID(el, "Chart.Threshold.sum")
+      .last()
+      .simulate("click");
   });
 });
