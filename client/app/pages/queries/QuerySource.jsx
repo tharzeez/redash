@@ -31,6 +31,7 @@ import useAutocompleteFlags from "./hooks/useAutocompleteFlags";
 import useAutoLimitFlags from "./hooks/useAutoLimitFlags";
 import useQueryExecute from "./hooks/useQueryExecute";
 import useQueryResultData from "@/lib/useQueryResultData";
+import { arePropertiesSame } from "@/lib/utils";
 import useQueryDataSources from "./hooks/useQueryDataSources";
 import useQueryFlags from "./hooks/useQueryFlags";
 import useQueryParameters from "./hooks/useQueryParameters";
@@ -159,6 +160,24 @@ function QuerySource(props) {
   }, []);
 
   const [selectedText, setSelectedText] = useState(null);
+
+  useEffect(() => {
+    if (queryResult && !queryResult.errorMessage) {
+      let clonedQueryVisualizations = query.visualizations;
+      clonedQueryVisualizations.map((viz) => {
+        const thresholdValue = Number(queryResult.query_result.data.rows[0][viz.options.thresholdColumnName]);
+        if (
+          viz.type !== "TABLE"
+          && arePropertiesSame(queryResult.query_result.data.rows, viz.options.thresholdColumnName)
+          && thresholdValue
+        ) {
+          viz.options.thresholdValue = thresholdValue;
+        }
+        return viz;
+      });
+      setQuery(extend(query.clone(), { visualizations: clonedQueryVisualizations }));
+    }
+  }, [queryResult]);
 
   const doExecuteQuery = useCallback(
     (skipParametersDirtyFlag = false) => {
