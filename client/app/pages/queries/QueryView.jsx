@@ -1,3 +1,4 @@
+import { extend } from "lodash";
 import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import cx from "classnames";
@@ -19,6 +20,7 @@ import routes from "@/services/routes";
 import { policy } from "@/services/policy";
 
 import useQueryResultData from "@/lib/useQueryResultData";
+import { arePropertiesSame } from "@/lib/utils";
 
 import QueryPageHeader from "./components/QueryPageHeader";
 import QueryVisualizationTabs from "./components/QueryVisualizationTabs";
@@ -73,6 +75,24 @@ function QueryView(props) {
   });
   const editVisualization = useEditVisualizationDialog(query, queryResult, newQuery => setQuery(newQuery));
   const deleteVisualization = useDeleteVisualization(query, setQuery);
+
+  useEffect(() => {
+    if (queryResult && !queryResult.errorMessage) {
+      let clonedQueryVisualizations = query.visualizations;
+      clonedQueryVisualizations.map((viz) => {
+        const thresholdValue = Number(queryResult.query_result.data.rows[0][viz.options.thresholdColumnName]);
+        if (
+          viz.type !== "TABLE"
+          && arePropertiesSame(queryResult.query_result.data.rows, viz.options.thresholdColumnName)
+          && thresholdValue
+        ) {
+          viz.options.thresholdValue = thresholdValue;
+        }
+        return viz;
+      });
+      setQuery(extend(query.clone(), { visualizations: clonedQueryVisualizations }));
+    }
+  }, [queryResult]);
 
   const doExecuteQuery = useCallback(
     (skipParametersDirtyFlag = false) => {
