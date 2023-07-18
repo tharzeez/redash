@@ -106,12 +106,17 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
     onOptionsChange({ columnMapping }, UpdateOptionsStrategy.shallowMerge);
   }
 
-  function handleColumnThresholdValueChange(column: any) {
+  function handleColumnThresholdValueChange(column: string) {
     if (arePropertiesSame(data.rows, column) && Number(data.rows[0][column])) {
       onOptionsChange({
         thresholdColumnName: column,
         thresholdValue: Number(data.rows[0][column])
-      });
+      }, UpdateOptionsStrategy.shallowMerge);
+    } else {
+      onOptionsChange({
+        thresholdColumnName: column,
+        thresholdValue: null,
+      }, UpdateOptionsStrategy.shallowMerge);
     }
   }
 
@@ -162,7 +167,7 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
       <Section>
         <Select
           label="Threshold"
-          value={options.thresholdColumnName}
+          value={options.thresholdColumnName || undefined}
           data-test="Chart.Threshold"
           allowClear
           showSearch

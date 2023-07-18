@@ -162,20 +162,22 @@ function QuerySource(props) {
   const [selectedText, setSelectedText] = useState(null);
 
   useEffect(() => {
-    if (queryResult && !queryResult.errorMessage) {
+    if (queryResult && !queryResult.errorMessage && query.visualizations) {
       let clonedQueryVisualizations = query.visualizations;
-      clonedQueryVisualizations.map((viz) => {
-        const thresholdValue = Number(queryResult.query_result.data.rows[0][viz.options.thresholdColumnName]);
-        if (
-          viz.type !== "TABLE"
-          && arePropertiesSame(queryResult.query_result.data.rows, viz.options.thresholdColumnName)
-          && thresholdValue
-        ) {
-          viz.options.thresholdValue = thresholdValue;
-        }
-        return viz;
-      });
-      setQuery(extend(query.clone(), { visualizations: clonedQueryVisualizations }));
+      if (queryResult.query_result.data.rows.length) {
+        clonedQueryVisualizations.map((viz) => {
+          const thresholdValue = Number(queryResult.query_result.data.rows[0][viz.options.thresholdColumnName]);
+          if (
+            viz.type !== "TABLE"
+            && arePropertiesSame(queryResult.query_result.data.rows, viz.options.thresholdColumnName)
+            && thresholdValue
+          ) {
+            viz.options.thresholdValue = thresholdValue;
+          }
+          return viz;
+        });
+        setQuery(extend(query.clone(), { visualizations: clonedQueryVisualizations }));
+      }
     }
   }, [queryResult]);
 
