@@ -18,7 +18,7 @@ import routes from "@/services/routes";
 import location from "@/services/location";
 import url from "@/services/url";
 import useImmutableCallback from "@/lib/hooks/useImmutableCallback";
-import { arePropertiesSame } from "@/lib/utils";
+import { arePropertyValuesEqual } from "@/lib/utils";
 
 import useDashboard from "./hooks/useDashboard";
 import DashboardHeader from "./components/DashboardHeader";
@@ -97,7 +97,7 @@ function DashboardComponent(props) {
           widget.data.query_result.data.rows[0][widget.visualization.options.thresholdColumnName]
         );
         if (
-          arePropertiesSame(widget.data.query_result.data.rows,
+          arePropertyValuesEqual(widget.data.query_result.data.rows,
             widget.visualization.options.thresholdColumnName)
           && thresholdValue
         ) {

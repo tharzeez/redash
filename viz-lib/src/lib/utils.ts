@@ -42,18 +42,18 @@ export function formatColumnValue(value: any, columnType = null) {
   return value;
 }
 
-export function arePropertiesSame(arr: any, property: string) {
+export function arePropertyValuesEqual(arr: any[], property: string) {
   if (arr.length === 0) {
     return true; // If the array is empty, all properties are considered the same
   }
 
   const firstValue = arr[0][property]; // Get the property value of the first object
 
-  for (let i = 1; i < arr.length; i++) {
-    if (arr[i][property] !== firstValue) {
-      return false; // If any subsequent property value is different, return false
-    }
+  // Check if the property exists in the first object
+  if (!(property in arr[0])) {
+    return false;
   }
 
-  return true; // If all property values are the same, return true
+  // Use the 'every' method to check if all subsequent property values are the same
+  return arr.every(obj => obj[property] === firstValue);
 }

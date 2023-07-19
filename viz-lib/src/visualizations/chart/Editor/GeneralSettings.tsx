@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Section, Select, Checkbox, InputNumber } from "@/components/visualizations/editor";
 import { UpdateOptionsStrategy } from "@/components/visualizations/editor/createTabbedEditor";
 import { EditorPropTypes } from "@/visualizations/prop-types";
-import { arePropertiesSame } from "@/lib/utils";
+import { arePropertyValuesEqual } from "@/lib/utils";
 
 import ChartTypeSelect from "./ChartTypeSelect";
 import ColumnMappingSelect from "./ColumnMappingSelect";
@@ -106,15 +106,15 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
     onOptionsChange({ columnMapping }, UpdateOptionsStrategy.shallowMerge);
   }
 
-  function handleColumnThresholdValueChange(column: string) {
-    if (arePropertiesSame(data.rows, column) && Number(data.rows[0][column])) {
+  function handleColumnThresholdValueChange(column: any) {
+    if (Number(data.rows[0][column])) {
       onOptionsChange({
         thresholdColumnName: column,
         thresholdValue: Number(data.rows[0][column])
       }, UpdateOptionsStrategy.shallowMerge);
-    } else {
+    } else if (!column) {
       onOptionsChange({
-        thresholdColumnName: column,
+        thresholdColumnName: undefined,
         thresholdValue: null,
       }, UpdateOptionsStrategy.shallowMerge);
     }
@@ -172,15 +172,19 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
           allowClear
           showSearch
           placeholder="Choose Threshold Column"
-          onChange={handleColumnThresholdValueChange}>
-          {map(data.columns, column => (
-            // @ts-expect-error ts-migrate(2339) FIXME: Property 'Option' does not exist on type '({ class... Remove this comment to see the full error message
-            <Select.Option data-test={`Chart.Threshold.${column.name}`} key={column.friendly_name} value={column.name}>
-              {column.name}
-              {/* @ts-expect-error ts-migrate(2339) FIXME: Property 'Option' does not exist on type '({ class... Remove this comment to see the full error message */}
-            </Select.Option>
-          ))}
-        </Select>
+          onChange={handleColumnThresholdValueChange}
+          options={map(data.columns,
+            column => (
+              {
+                label: column.name,
+                value: column.name,
+                disabled: !arePropertyValuesEqual(data.rows, column.name),
+                title: !arePropertyValuesEqual(data.rows, column.name)
+                  && "The threshold column should have the same value in all rows.",
+              })
+            )
+          }
+        />
       </Section>
 
       {map(mappedColumns, (value, type) => (
