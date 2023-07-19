@@ -176,6 +176,7 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
           options={map(data.columns,
             column => (
               {
+                "data-test": `Chart.Threshold.${column.friendly_name}`,
                 label: column.name,
                 value: column.name,
                 disabled: !arePropertyValuesEqual(data.rows, column.name),
