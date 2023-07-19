@@ -90,23 +90,28 @@ function DashboardComponent(props) {
   } = dashboardConfiguration;
 
   useEffect(() => {
-    const clonedDashboardWidgets = dashboard.widgets;
-    clonedDashboardWidgets.map((widget) => {
-      if (widget.visualization.type !== "TABLE" && !isEmpty(widget.data)) {
-        const thresholdValue = Number(
-          widget.data.query_result.data.rows[0][widget.visualization.options.thresholdColumnName]
-        );
-        if (
-          arePropertyValuesEqual(widget.data.query_result.data.rows,
-            widget.visualization.options.thresholdColumnName)
-          && thresholdValue
+    if (dashboard.widgets.length) {
+      const clonedDashboardWidgets = dashboard.widgets;
+      clonedDashboardWidgets.map((widget) => {
+        if (widget.visualization.type !== "TABLE"
+          && !isEmpty(widget.data)
+          && widget.data.query_result.data.rows.length
         ) {
-          widget.visualization.options.thresholdValue = thresholdValue;
+          const thresholdValue = Number(
+            widget.data.query_result.data.rows[0][widget.visualization.options.thresholdColumnName]
+          );
+          if (
+            arePropertyValuesEqual(widget.data.query_result.data.rows,
+              widget.visualization.options.thresholdColumnName)
+            && thresholdValue
+          ) {
+            widget.visualization.options.thresholdValue = thresholdValue;
+          }
         }
-      }
-      return widget;
-    });
-    refreshDashboard({ widgets: clonedDashboardWidgets });
+        return widget;
+      });
+      refreshDashboard({ widgets: clonedDashboardWidgets });
+    }
   }, [dashboard]);
 
   const [pageContainer, setPageContainer] = useState(null);

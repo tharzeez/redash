@@ -77,7 +77,7 @@ function QueryView(props) {
   const deleteVisualization = useDeleteVisualization(query, setQuery);
 
   useEffect(() => {
-    if (queryResult && !queryResult.errorMessage) {
+    if (queryResult && !queryResult.errorMessage && query.visualizations && queryResult.query_result.data.rows.length) {
       let clonedQueryVisualizations = query.visualizations;
       clonedQueryVisualizations.map((viz) => {
         const thresholdValue = Number(queryResult.query_result.data.rows[0][viz.options.thresholdColumnName]);

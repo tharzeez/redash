@@ -162,7 +162,7 @@ function QuerySource(props) {
   const [selectedText, setSelectedText] = useState(null);
 
   useEffect(() => {
-    if (queryResult && !queryResult.errorMessage && query.visualizations) {
+    if (queryResult && !queryResult.errorMessage && query.visualizations && queryResult.query_result.data.rows.length) {
       let clonedQueryVisualizations = query.visualizations;
       if (queryResult.query_result.data.rows.length) {
         clonedQueryVisualizations.map((viz) => {

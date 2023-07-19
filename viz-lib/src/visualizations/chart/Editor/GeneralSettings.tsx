@@ -180,7 +180,8 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
                 value: column.name,
                 disabled: !arePropertyValuesEqual(data.rows, column.name),
                 title: !arePropertyValuesEqual(data.rows, column.name)
-                  && "The threshold column should have the same value in all rows.",
+                  ? "The threshold column should have the same value in all rows."
+                  : "",
               })
             )
           }
