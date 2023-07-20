@@ -163,7 +163,7 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
         </Section>
       )}
 
-      { /* @ts-expect-error ts-migrate(2745) FIXME: This JSX tag's 'children' prop expects type 'never... Remove this comment to see the full error message */ }
+      {/* @ts-expect-error ts-migrate(2745) FIXME: This JSX tag's 'children' prop expects type 'never... Remove this comment to see the full error message */}
       <Section>
         <Select
           label="Threshold"
@@ -173,17 +173,15 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
           showSearch
           placeholder="Choose Threshold Column"
           onChange={handleColumnThresholdValueChange}
-          options={map(data.columns, useCallback((column: any) => (
-            {
-              "data-test": `Chart.Threshold.${column.friendly_name}`,
-              label: column.name,
-              value: column.name,
-              disabled: !arePropertyValuesEqual(data.rows, column.name),
-              title: !arePropertyValuesEqual(data.rows, column.name)
-                ? "The threshold column should have the same value in all rows."
-                : "",
-            }), [data.columns]))
-          }
+          options={map(data.columns, (column: any) => ({
+            "data-test": `Chart.Threshold.${column.friendly_name}`,
+            label: column.name,
+            value: column.name,
+            disabled: !arePropertyValuesEqual(data.rows, column.name),
+            title: !arePropertyValuesEqual(data.rows, column.name)
+              ? "The threshold column should have the same value in all rows."
+              : "",
+          }))}
         />
       </Section>
 
