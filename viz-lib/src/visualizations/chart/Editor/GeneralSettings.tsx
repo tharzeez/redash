@@ -1,5 +1,5 @@
 import { isArray, map, mapValues, includes, some, each, difference, toNumber } from "lodash";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Section, Select, Checkbox, InputNumber } from "@/components/visualizations/editor";
 import { UpdateOptionsStrategy } from "@/components/visualizations/editor/createTabbedEditor";
 import { EditorPropTypes } from "@/visualizations/prop-types";
@@ -173,18 +173,16 @@ export default function GeneralSettings({ options, data, onOptionsChange }: any)
           showSearch
           placeholder="Choose Threshold Column"
           onChange={handleColumnThresholdValueChange}
-          options={map(data.columns,
-            column => (
-              {
-                "data-test": `Chart.Threshold.${column.friendly_name}`,
-                label: column.name,
-                value: column.name,
-                disabled: !arePropertyValuesEqual(data.rows, column.name),
-                title: !arePropertyValuesEqual(data.rows, column.name)
-                  ? "The threshold column should have the same value in all rows."
-                  : "",
-              })
-            )
+          options={map(data.columns, useCallback((column: any) => (
+            {
+              "data-test": `Chart.Threshold.${column.friendly_name}`,
+              label: column.name,
+              value: column.name,
+              disabled: !arePropertyValuesEqual(data.rows, column.name),
+              title: !arePropertyValuesEqual(data.rows, column.name)
+                ? "The threshold column should have the same value in all rows."
+                : "",
+            }), [data.columns]))
           }
         />
       </Section>
