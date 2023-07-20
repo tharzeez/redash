@@ -95,6 +95,7 @@ function DashboardComponent(props) {
       clonedDashboardWidgets.map((widget) => {
         if (widget.visualization.type !== "TABLE"
           && !isEmpty(widget.data)
+          && isEmpty(widget.data.errorMessage)
           && widget.data.query_result.data.rows.length
         ) {
           const thresholdValue = Number(
@@ -110,7 +111,7 @@ function DashboardComponent(props) {
         }
         return widget;
       });
-      refreshDashboard({ widgets: clonedDashboardWidgets });
+      refreshDashboard(clonedDashboardWidgets);
     }
   }, [dashboard]);
 
