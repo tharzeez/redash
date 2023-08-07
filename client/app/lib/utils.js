@@ -204,3 +204,19 @@ export function formatColumnValue(value, columnType = null) {
 
   return value;
 }
+
+export function arePropertyValuesEqual(arr, property) {
+  if (arr.length === 0) {
+    return true; // If the array is empty, all properties are considered the same
+  }
+
+  const firstValue = arr[0][property]; // Get the property value of the first object
+
+  // Check if the property exists in the first object
+  if (!(property in arr[0])) {
+    return false;
+  }
+
+  // Use the 'every' method to check if all subsequent property values are the same
+  return arr.every(obj => obj[property] === firstValue);
+}

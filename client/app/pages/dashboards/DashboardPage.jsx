@@ -18,6 +18,7 @@ import routes from "@/services/routes";
 import location from "@/services/location";
 import url from "@/services/url";
 import useImmutableCallback from "@/lib/hooks/useImmutableCallback";
+import { arePropertyValuesEqual } from "@/lib/utils";
 
 import useDashboard from "./hooks/useDashboard";
 import DashboardHeader from "./components/DashboardHeader";
@@ -87,6 +88,32 @@ function DashboardComponent(props) {
     editingLayout,
     setGridDisabled,
   } = dashboardConfiguration;
+
+  useEffect(() => {
+    if (dashboard.widgets.length) {
+      const clonedDashboardWidgets = dashboard.widgets;
+      clonedDashboardWidgets.map((widget) => {
+        if (widget.visualization.type !== "TABLE"
+          && !isEmpty(widget.data)
+          && isEmpty(widget.data.errorMessage)
+          && widget.data.query_result.data.rows.length
+        ) {
+          const thresholdValue = Number(
+            widget.data.query_result.data.rows[0][widget.visualization.options.thresholdColumnName]
+          );
+          if (
+            arePropertyValuesEqual(widget.data.query_result.data.rows,
+              widget.visualization.options.thresholdColumnName)
+            && thresholdValue
+          ) {
+            widget.visualization.options.thresholdValue = thresholdValue;
+          }
+        }
+        return widget;
+      });
+      refreshDashboard(clonedDashboardWidgets);
+    }
+  }, [dashboard]);
 
   const [pageContainer, setPageContainer] = useState(null);
   const [bottomPanelStyles, setBottomPanelStyles] = useState({});

@@ -31,6 +31,7 @@ import useAutocompleteFlags from "./hooks/useAutocompleteFlags";
 import useAutoLimitFlags from "./hooks/useAutoLimitFlags";
 import useQueryExecute from "./hooks/useQueryExecute";
 import useQueryResultData from "@/lib/useQueryResultData";
+import { arePropertyValuesEqual } from "@/lib/utils";
 import useQueryDataSources from "./hooks/useQueryDataSources";
 import useQueryFlags from "./hooks/useQueryFlags";
 import useQueryParameters from "./hooks/useQueryParameters";
@@ -134,11 +135,10 @@ function QuerySource(props) {
     // choose data source id for new queries
     if (dataSourcesLoaded && queryFlags.isNew) {
       const firstDataSourceId = dataSources.length > 0 ? dataSources[0].id : null;
+      const selectedDataSourceId = parseInt(localStorage.getItem("lastSelectedDataSourceId")) || null;
+
       handleDataSourceChange(
-        chooseDataSourceId(
-          [query.data_source_id, localStorage.getItem("lastSelectedDataSourceId"), firstDataSourceId],
-          dataSources
-        )
+        chooseDataSourceId([query.data_source_id, selectedDataSourceId, firstDataSourceId], dataSources)
       );
     }
   }, [query.data_source_id, queryFlags.isNew, dataSourcesLoaded, dataSources, handleDataSourceChange]);
@@ -159,6 +159,26 @@ function QuerySource(props) {
   }, []);
 
   const [selectedText, setSelectedText] = useState(null);
+
+  useEffect(() => {
+    if (queryResult && !queryResult.errorMessage && query.visualizations && queryResult.query_result.data.rows.length) {
+      let clonedQueryVisualizations = query.visualizations;
+      if (queryResult.query_result.data.rows.length) {
+        clonedQueryVisualizations.map((viz) => {
+          const thresholdValue = Number(queryResult.query_result.data.rows[0][viz.options.thresholdColumnName]);
+          if (
+            viz.type !== "TABLE"
+            && arePropertyValuesEqual(queryResult.query_result.data.rows, viz.options.thresholdColumnName)
+            && thresholdValue
+          ) {
+            viz.options.thresholdValue = thresholdValue;
+          }
+          return viz;
+        });
+        setQuery(extend(query.clone(), { visualizations: clonedQueryVisualizations }));
+      }
+    }
+  }, [queryResult]);
 
   const doExecuteQuery = useCallback(
     (skipParametersDirtyFlag = false) => {

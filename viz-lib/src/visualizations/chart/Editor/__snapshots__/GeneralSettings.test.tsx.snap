@@ -44,6 +44,13 @@ Object {
 }
 `;
 
+exports[`Visualizations -> Chart -> Editor -> General Settings Selects threshold column from options 1`] = `
+Object {
+  "thresholdColumnName": "sum",
+  "thresholdValue": 120,
+}
+`;
+
 exports[`Visualizations -> Chart -> Editor -> General Settings Toggles horizontal bar chart 1`] = `
 Object {
   "seriesOptions": Object {},
