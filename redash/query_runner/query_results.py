@@ -7,11 +7,11 @@ from urllib.parse import parse_qs
 from redash import models
 from redash.permissions import has_access, view_only
 from redash.query_runner import (
-    BaseQueryRunner,
     TYPE_STRING,
+    BaseQueryRunner,
+    JobTimeoutException,
     guess_type,
     register,
-    JobTimeoutException,
 )
 from redash.utils import json_dumps, json_loads
 
@@ -66,13 +66,7 @@ def get_query_results(user, query_id, bring_from_cache, params = None):
         else:
             raise Exception("No cached result available for query {}.".format(query.id))
     else:
-        query_text = query.query_text
-        if (params is not None):
-            query_text = replace_query_parameters(query_text, params)
-                
-        results, error = query.data_source.query_runner.run_query(
-            query_text, user
-        )
+        results, error = query.data_source.query_runner.run_query(query.query_text, user)
         if error:
             raise Exception("Failed loading results for query id {}.".format(query.id))
         else:
@@ -86,7 +80,7 @@ def create_tables_from_query_ids(user, connection, query_ids, query_params, cach
         results = get_query_results(user, query_id, True)
         table_name = "cached_query_{query_id}".format(query_id=query_id)
         create_table(connection, table_name, results)
-    
+
     for query in set(query_params):
         results = get_query_results(user, query[0], False, query[1])
         table_hash =  hashlib.md5("query_{query}_{hash}".format(query=query[0], hash=query[1]).encode()).hexdigest()
@@ -100,7 +94,7 @@ def create_tables_from_query_ids(user, connection, query_ids, query_params, cach
 
 
 def fix_column_name(name):
-    return '"{}"'.format(re.sub('[:."\s]', "_", name, flags=re.UNICODE))
+    return '"{}"'.format(re.sub(r'[:."\s]', "_", name, flags=re.UNICODE))
 
 
 def flatten(value):
@@ -122,9 +116,7 @@ def create_table(connection, table_name, query_results):
         logger.debug("CREATE TABLE query: %s", create_table)
         connection.execute(create_table)
     except sqlite3.OperationalError as exc:
-        raise CreateTableError(
-            "Error creating table {}: {}".format(table_name, str(exc))
-        )
+        raise CreateTableError("Error creating table {}: {}".format(table_name, str(exc)))
 
     insert_template = "insert into {table_name} ({column_list}) values ({place_holders})".format(
         table_name=table_name,
@@ -160,9 +152,9 @@ class Results(BaseQueryRunner):
         connection = sqlite3.connect(":memory:")
 
         query_ids = extract_query_ids(query)
- 
+
         query_params = extract_query_params(query)
-        
+
         cached_query_ids = extract_cached_query_ids(query)
         create_tables_from_query_ids(user, connection, query_ids, query_params, cached_query_ids)
 
