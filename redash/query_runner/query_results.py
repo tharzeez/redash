@@ -66,7 +66,13 @@ def get_query_results(user, query_id, bring_from_cache, params = None):
         else:
             raise Exception("No cached result available for query {}.".format(query.id))
     else:
-        results, error = query.data_source.query_runner.run_query(query.query_text, user)
+        query_text = query.query_text
+        if (params is not None):
+            query_text = replace_query_parameters(query_text, params)
+
+        results, error = query.data_source.query_runner.run_query(
+            query_text, user
+        )
         if error:
             raise Exception("Failed loading results for query id {}.".format(query.id))
         else:

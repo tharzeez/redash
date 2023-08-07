@@ -11,8 +11,11 @@ from redash.query_runner.query_results import (
     create_table,
     extract_cached_query_ids,
     extract_query_ids,
-    fix_column_name,
+    extract_query_params,
     get_query_results,
+    fix_column_name,
+    prepare_parameterized_query,
+    replace_query_parameters
 )
 from redash.utils import json_dumps
 from tests import BaseTestCase
